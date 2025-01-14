@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getMenuItems,getUserId,addUser } from "../api/api";
+import { getMenuItems, getUserId, addUser } from "../api/api";
 import MenuItemCard from "../components/MenuItemCard";
 import { RiFileList2Line } from 'react-icons/ri';
 import ModalUserDetailslogin from "../components/ModalUserDetailslogin";
@@ -8,10 +8,8 @@ import "../styles/MenuPage.css";
 
 const MenuPage = ({ addToCart, cart, incrementItem, decrementItem }) => {
 
-  // const { restaurantName, tableName } = useParams(); for dynamic
-
-  const restaurantName = "WafflePondy"; // Static test value
-  const tableName = "table1"; // Static test value
+  const restaurantName = "WafflePondy"; 
+  const tableName = "table1"; 
 
   const navigate = useNavigate();
 
@@ -25,11 +23,21 @@ const MenuPage = ({ addToCart, cart, incrementItem, decrementItem }) => {
   useEffect(() => {
     const fetchMenuItems = async () => {
       const items = await getMenuItems(restaurantName);
-      setMenuItems(items);
-      setFilteredItems(items);
-      const uniqueCategories = ["All", ...new Set(items.map((item) => item.category))];
-      setCategories(uniqueCategories);
+      console.log(items); // Log the API response
+
+      if (Array.isArray(items)) {
+        setMenuItems(items);
+        setFilteredItems(items);
+        const uniqueCategories = ["All", ...new Set(items.map((item) => item.category))];
+        setCategories(uniqueCategories);
+      } else {
+        console.error("API response is not an array:", items);
+        setMenuItems([]); 
+        setFilteredItems([]);
+        setCategories(["All"]); 
+      }
     };
+
     fetchMenuItems();
   }, [restaurantName]);
 
@@ -67,13 +75,13 @@ const MenuPage = ({ addToCart, cart, incrementItem, decrementItem }) => {
       return;
     }
 
-     try {
-    const userId = await getUserId(restaurantName, username, mobileNumber);
-    console.log("After successful login: ",userId);
-    console.log(userId);
-    if (userId) {
-      navigate(`/${restaurantName}/my-orders/${userId}`);
-    }
+    try {
+      const userId = await getUserId(restaurantName, username, mobileNumber);
+      console.log("After successful login: ", userId);
+      console.log(userId);
+      if (userId) {
+        navigate(`/${restaurantName}/my-orders/${userId}`);
+      }
     } catch (error) {
       console.error("Error navigating to orders:", error.message);
       alert("Failed to retrieve user ID.");
@@ -94,7 +102,6 @@ const MenuPage = ({ addToCart, cart, incrementItem, decrementItem }) => {
     }
   };
 
-
   const calculateTotal = () => cart.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
@@ -108,27 +115,25 @@ const MenuPage = ({ addToCart, cart, incrementItem, decrementItem }) => {
         />
         <div className="cart-summary">
 
-        {modalOpen && (
-        <ModalUserDetailslogin
-          onClose={() => setModalOpen(false)}
-          onSubmit={handleModalSubmit}
-        />
-      )}
+          {modalOpen && (
+            <ModalUserDetailslogin
+              onClose={() => setModalOpen(false)}
+              onSubmit={handleModalSubmit}
+            />
+          )}
           <span>Total: ₹{calculateTotal().toFixed(2)}</span>
           <span>Items: {cart.length}</span>
 
-          {/* My Orders button with icon */}
           <button onClick={navigateToOrders} className="orders-button">
-          <RiFileList2Line /> My Orders
+            <RiFileList2Line /> My Orders
           </button>
-
 
           <button onClick={navigateToCart}>Go to Cart</button>
 
         </div>
       </div>
 
-      <div className="categories-container"> 
+      <div className="categories-container">
         <div className="categories-scroll">
           {categories.map((category) => (
             <button
@@ -139,22 +144,22 @@ const MenuPage = ({ addToCart, cart, incrementItem, decrementItem }) => {
               {category}
             </button>
           ))}
-</div>
-        </div>
-
-        <div className="menu-container">
-          {filteredItems.map((item) => (
-            <MenuItemCard
-              key={item.unique_id}
-              item={item}
-              cartItem={cart.find((cartItem) => cartItem.unique_id === item.unique_id)}
-              addToCart={addToCart}
-              incrementItem={incrementItem}
-              decrementItem={decrementItem}
-            />
-          ))}
         </div>
       </div>
+
+      <div className="menu-container">
+        {filteredItems.map((item) => (
+          <MenuItemCard
+            key={item.unique_id}
+            item={item}
+            cartItem={cart.find((cartItem) => cartItem.unique_id === item.unique_id)}
+            addToCart={addToCart}
+            incrementItem={incrementItem}
+            decrementItem={decrementItem}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
 

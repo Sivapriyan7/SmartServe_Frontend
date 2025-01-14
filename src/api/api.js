@@ -1,17 +1,18 @@
+// api.js
 import axios from 'axios';
 
-const BASE_URL = "3.111.57.60:8000";
+const BASE_URL = "3.111.57.60:8000"; 
 
 export const getMenuItems = async (restaurantName) => {
   try {
     console.log(restaurantName);
-    const response = await axios.get(`${BASE_URL}/get-menu-items/${restaurantName}`);
+    const response = await axios.get(`http://${BASE_URL}/get-menu-items/${restaurantName}`); // Corrected URL
     console.log("in getting menu items");
-    console.log(response.data);
+    console.log("response data  ", response.data); 
     return response.data;
   } catch (error) {
     console.error("Error fetching menu items:", error);
-    return [];
+    return []; 
   }
 };
 
