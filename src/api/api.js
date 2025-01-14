@@ -4,6 +4,7 @@ const BASE_URL = "3.111.57.60:8000";
 
 export const getMenuItems = async (restaurantName) => {
   try {
+    console.log(restaurantName);
     const response = await axios.get(`${BASE_URL}/get-menu-items/${restaurantName}`);
     console.log("in getting menu items");
     console.log(response.data);
