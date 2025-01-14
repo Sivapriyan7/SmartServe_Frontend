@@ -5,7 +5,9 @@ const BASE_URL = "http://65.0.5.52:8000";
 export const getMenuItems = async (restaurantName) => {
   try {
     const response = await axios.get(`${BASE_URL}/get-menu-items/${restaurantName}`);
-    return response.data.menu_items;
+    console.log("in getting menu items");
+    console.log(response.data);
+    return response.data;
   } catch (error) {
     console.error("Error fetching menu items:", error);
     return [];
